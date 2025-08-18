@@ -1,0 +1,28 @@
+name: SlotMachine
+version: 2.0.0
+main: com.infinity3113.slotmachine.SlotMachinePlugin
+api-version: '1.20'
+depend: [Vault]
+author: infinity3113
+description: Un plugin de maquinas tragamonedas con Jukebox y ItemFrames.
+
+commands:
+  slot:
+    description: Comando principal para la maquina tragamonedas.
+    usage: /slot <create|delete|getcoin|reload>
+    aliases: [slots, tragamonedas]
+    permission: slotmachine.admin
+
+permissions:
+  slotmachine.admin:
+    description: Permite usar los comandos de administrador para las tragamonedas.
+    default: op
+  slotmachine.use:
+    description: Permite a los jugadores usar las maquinas tragamonedas.
+    default: true
+  slotmachine.sign.create:
+    description: Permite crear carteles de venta de fichas.
+    default: op
+  slotmachine.sign.use:
+    description: Permite usar carteles de venta de fichas.
+    default: true

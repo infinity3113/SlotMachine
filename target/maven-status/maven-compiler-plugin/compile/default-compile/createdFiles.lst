@@ -1,0 +1,13 @@
+com\infinity3113\slotmachine\SlotMachinePlugin.class
+com\infinity3113\slotmachine\machine\SlotMachineManager.class
+com\infinity3113\slotmachine\machine\SlotMachineManager$CreationProgress.class
+com\infinity3113\slotmachine\command\SlotCommand.class
+com\infinity3113\slotmachine\gui\PurchaseMenu.class
+com\infinity3113\slotmachine\listener\SignListener.class
+com\infinity3113\slotmachine\machine\SpinTask.class
+com\infinity3113\slotmachine\listener\MachineUseListener.class
+com\infinity3113\slotmachine\util\MessageUtil.class
+com\infinity3113\slotmachine\economy\EconomyManager.class
+com\infinity3113\slotmachine\gui\GuiListener.class
+com\infinity3113\slotmachine\machine\SlotMachine.class
+com\infinity3113\slotmachine\listener\MachineCreationListener.class
