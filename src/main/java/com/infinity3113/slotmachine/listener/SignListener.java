@@ -35,9 +35,8 @@ public class SignListener implements Listener {
             return;
         }
 
-        // El nuevo formato solo necesita el precio por ficha en la línea 3
         try {
-            Double.parseDouble(event.getLine(2)); // Precio
+            Double.parseDouble(event.getLine(2));
         } catch (Exception e) {
             MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.invalid_sign_format"));
             event.setLine(0, MessageUtil.colorize("&c[Error]"));
@@ -47,7 +46,7 @@ public class SignListener implements Listener {
         event.setLine(0, MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line1")));
         event.setLine(1, MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line2")));
         event.setLine(2, MessageUtil.colorize("&a$" + event.getLine(2)));
-        event.setLine(3, ""); // Línea 4 vacía
+        event.setLine(3, "");
         MessageUtil.sendMessage(player, "&a¡Cartel de compra creado!");
     }
 
@@ -62,7 +61,6 @@ public class SignListener implements Listener {
             return;
         }
         
-        // Cancelar el evento para evitar el mensaje "You can't edit this"
         event.setCancelled(true);
 
         Player player = event.getPlayer();
@@ -73,7 +71,7 @@ public class SignListener implements Listener {
 
         try {
             double pricePerCoin = Double.parseDouble(ChatColor.stripColor(sign.getLine(2)).replace("$", ""));
-            PurchaseMenu menu = new PurchaseMenu(plugin, pricePerCoin);
+            PurchaseMenu menu = new PurchaseMenu(plugin, pricePerCoin, player);
             menu.open(player);
         } catch (Exception e) {
             MessageUtil.sendMessage(player, "&cEl cartel parece estar dañado.");

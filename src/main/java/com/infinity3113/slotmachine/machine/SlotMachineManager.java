@@ -2,13 +2,10 @@ package com.infinity3113.slotmachine.machine;
 
 import com.infinity3113.slotmachine.SlotMachinePlugin;
 import com.infinity3113.slotmachine.util.MessageUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -43,7 +40,7 @@ public class SlotMachineManager {
     }
 
     public void loadMachines() {
-        machinesByName.values().forEach(SlotMachine::removeHologram); // Limpiar hologramas viejos
+        machinesByName.values().forEach(SlotMachine::removeHologram);
         machinesByName.clear();
         ConfigurationSection machinesSection = machinesConfig.getConfigurationSection("machines");
         if (machinesSection == null) return;
@@ -89,9 +86,9 @@ public class SlotMachineManager {
     public void deleteMachine(String name) {
         SlotMachine machine = getMachineByName(name);
         if (machine != null) {
-            machine.cleanup(); // Limpiar marcos y holograma
+            machine.cleanup();
             machinesByName.remove(name.toLowerCase());
-            machinesConfig.set("machines." + machine.getName(), null); // Borrar del archivo
+            machinesConfig.set("machines." + machine.getName(), null);
             saveMachines();
         }
     }

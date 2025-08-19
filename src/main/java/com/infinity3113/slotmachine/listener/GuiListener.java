@@ -32,7 +32,7 @@ public class GuiListener implements Listener {
             return;
         }
 
-        event.setCancelled(true); // Prevenir que el jugador tome los items
+        event.setCancelled(true);
         PurchaseMenu menu = openMenus.get(player.getUniqueId());
         Inventory clickedInventory = event.getClickedInventory();
         ItemStack clickedItem = event.getCurrentItem();
@@ -45,26 +45,26 @@ public class GuiListener implements Listener {
 
         int slot = event.getSlot();
         switch (slot) {
-            case 10: // Remove 10
+            case 10:
                 menu.updateQuantity(player, -10);
                 break;
-            case 11: // Remove 1
+            case 11:
                 menu.updateQuantity(player, -1);
                 break;
-            case 15: // Add 1
+            case 15:
                 menu.updateQuantity(player, 1);
                 break;
-            case 16: // Add 10
+            case 16:
                 menu.updateQuantity(player, 10);
                 break;
-            case 22: // Set Max
-                 menu.setmaxQuantity(player);
+            case 22:
+                 menu.setMaxQuantity(player);
                 break;
-            case 30: // Cancel
+            case 30:
                 player.closeInventory();
                 openMenus.remove(player.getUniqueId());
                 break;
-            case 32: // Confirm
+            case 32:
                 handlePurchase(player, menu);
                 break;
         }

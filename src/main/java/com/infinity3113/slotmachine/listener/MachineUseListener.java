@@ -4,9 +4,7 @@ import com.infinity3113.slotmachine.SlotMachinePlugin;
 import com.infinity3113.slotmachine.command.SlotCommand;
 import com.infinity3113.slotmachine.machine.SlotMachine;
 import com.infinity3113.slotmachine.util.MessageUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,13 +45,13 @@ public class MachineUseListener implements Listener {
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
         ItemStack requiredCoin = SlotCommand.getCoinItem();
 
-        if (itemInHand == null || !itemInHand.isSimilar(requiredCoin)) {
+        if (!itemInHand.isSimilar(requiredCoin)) {
              String coinName = requiredCoin.getItemMeta().hasDisplayName() ? requiredCoin.getItemMeta().getDisplayName() : "Ficha";
              MessageUtil.sendMessage(player, "&cNecesitas una " + coinName + " &cpara jugar.");
             return;
         }
 
-        int cost = plugin.getConfig().getInt("play_cost", 1);
+        int cost = plugin.getConfig().getInt("machine_settings.play_cost", 1);
         if (itemInHand.getAmount() < cost) {
              String coinName = requiredCoin.getItemMeta().hasDisplayName() ? requiredCoin.getItemMeta().getDisplayName() : "Ficha";
              MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.not_enough_coins")
@@ -62,26 +60,7 @@ public class MachineUseListener implements Listener {
             return;
         }
         
-        double coinValue = 50.0; // Valor por defecto
-        boolean signFound = false;
-        for (int x = -5; x <= 5; x++) {
-            for (int y = -5; y <= 5; y++) {
-                for (int z = -5; z <= 5; z++) {
-                    if (machine.getJukeboxLocation().clone().add(x, y, z).getBlock().getState() instanceof Sign) {
-                        Sign sign = (Sign) machine.getJukeboxLocation().clone().add(x, y, z).getBlock().getState();
-                        if (sign.getLine(0).equalsIgnoreCase(MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line1")))) {
-                            try {
-                                coinValue = Double.parseDouble(ChatColor.stripColor(sign.getLine(2)).replace("$", ""));
-                                signFound = true;
-                                break;
-                            } catch (Exception ignored) {}
-                        }
-                    }
-                }
-                if(signFound) break;
-            }
-            if(signFound) break;
-        }
+        double coinValue = plugin.getConfig().getDouble("machine_settings.coin_value_for_jackpot", 50.0);
 
         itemInHand.setAmount(itemInHand.getAmount() - cost);
         machine.startSpin(player, coinValue);

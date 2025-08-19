@@ -29,8 +29,7 @@ public class SlotMachine {
 
     private boolean isSpinning = false;
     private BukkitTask spinTask;
-
-    // Nuevos campos para el bote
+    
     private double currentJackpot;
     private UUID hologramUuid;
     private ArmorStand hologram;
@@ -76,21 +75,19 @@ public class SlotMachine {
             Entity entity = Bukkit.getEntity(hologramUuid);
             if (entity instanceof ArmorStand) {
                 this.hologram = (ArmorStand) entity;
-                updateHologram(); // Asegurarse de que el texto esté actualizado al cargar
+                updateHologram();
             }
         }
     }
 
     private void createHologram() {
         if (!plugin.getConfig().getBoolean("jackpot.enabled", true)) return;
-        // ***** CAMBIO REALIZADO AQUÍ *****
-        // Se sube el holograma 1 bloque (de 0.5 a 1.5 en el eje Y)
         Location hologramLoc = jukeboxLocation.clone().add(0.5, 1.5, 0.5); 
         this.hologram = (ArmorStand) jukeboxLocation.getWorld().spawnEntity(hologramLoc, EntityType.ARMOR_STAND);
         this.hologram.setVisible(false);
         this.hologram.setGravity(false);
         this.hologram.setCustomNameVisible(true);
-        this.hologram.setMarker(true); // No se puede interactuar con él
+        this.hologram.setMarker(true);
         this.hologramUuid = this.hologram.getUniqueId();
         updateHologram();
     }
@@ -124,13 +121,11 @@ public class SlotMachine {
     public void startSpin(Player player, double coinValue) {
         if (isSpinning || !isValid()) return;
 
-        // Contribución al bote
         if (plugin.getConfig().getBoolean("jackpot.enabled")) {
-            double contributionPercent = plugin.getConfig().getDouble("jackpot.contribution_percentage", 50);
-            double contribution = coinValue * (contributionPercent / 100.0);
+            double contribution = coinValue * (plugin.getConfig().getInt("machine_settings.play_cost", 1));
             this.currentJackpot += contribution;
             updateHologram();
-            plugin.getSlotMachineManager().saveMachines(); // Guardar el nuevo bote
+            plugin.getSlotMachineManager().saveMachines();
         }
 
         this.isSpinning = true;
@@ -174,7 +169,6 @@ public class SlotMachine {
         section.set("currentJackpot", currentJackpot);
     }
 
-    // Getters y Setters
     public String getName() { return name; }
     public Location getJukeboxLocation() { return jukeboxLocation; }
     public ItemFrame[] getItemFrames() { return itemFrames; }

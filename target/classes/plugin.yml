@@ -26,3 +26,9 @@ permissions:
   slotmachine.sign.use:
     description: Permite usar carteles de venta de fichas.
     default: true
+  slotmachine.discount.vip1:
+    description: Permiso de ejemplo para un descuento VIP.
+    default: op
+  slotmachine.discount.vip2:
+    description: Permiso de ejemplo para un descuento VIP superior.
+    default: op

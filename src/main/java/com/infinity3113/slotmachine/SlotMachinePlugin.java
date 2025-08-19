@@ -36,7 +36,7 @@ public final class SlotMachinePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MachineUseListener(this), this);
         getServer().getPluginManager().registerEvents(new MachineCreationListener(this), this);
         getServer().getPluginManager().registerEvents(new SignListener(this), this);
-        getServer().getPluginManager().registerEvents(new GuiListener(this), this); // Listener para el nuevo GUI
+        getServer().getPluginManager().registerEvents(new GuiListener(this), this);
 
         getLogger().info("Plugin SlotMachine v3 activado exitosamente.");
     }

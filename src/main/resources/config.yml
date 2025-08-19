@@ -1,4 +1,3 @@
-# --- Configuración de la Moneda ---
 coin:
   material: "GOLD_NUGGET"
   name: "&6&lFicha de Casino"
@@ -6,35 +5,38 @@ coin:
     - "&7Usa esta ficha en una"
     - "&7maquina tragamonedas."
 
-# --- Configuración de la Máquina ---
-play_cost: 1 # Costo en fichas para cada jugada.
+machine_settings:
+  play_cost: 1
+  coin_value_for_jackpot: 50.0
+  spin_duration:
+    base_ticks: 60
+    reel_delay_ticks: 20
+    extra_random_ticks: 20
+    timeout_seconds: 15
 
-# --- BOTE PROGRESIVO (JACKPOT) ---
 jackpot:
   enabled: true
   starting_amount: 500.0
-  contribution_percentage: 50
   combination: "DIAMOND,DIAMOND,DIAMOND"
   hologram_text: "&e&lBote: &a${amount}"
   win_message: "&6&l¡¡¡JACKPOT!!! &f¡Has ganado el bote de &e${amount}&f!"
 
-# --- CARTELES DE VENTA (ahora abren el menú GUI) ---
 buy_sign:
   line1: "[Tragamonedas]"
   line2: "Comprar Fichas"
 
-# --- MENÚ DE COMPRA (GUI) ---
 purchase_gui:
   title: "&1Comprar Fichas de Casino"
-  # Items y botones del menú
   info_item:
     material: "PAPER"
     name: "&eInformación de Compra"
     lore:
       - "&7Cantidad: &b{quantity}"
+      - "{discount_line}"
       - "&7Costo Total: &a${cost}"
       - ""
       - "&7Tu Saldo: &a${balance}"
+  discount_line_format: "&7Descuento ({percentage}%): &c-${discount_amount}"
   confirm_item:
     material: "EMERALD_BLOCK"
     name: "&a&lConfirmar Compra"
@@ -57,7 +59,14 @@ purchase_gui:
     material: "DIAMOND"
     name: "&bComprar el máximo posible"
 
-# --- Mensajes Generales ---
+purchase_discounts:
+  vip1:
+    permission: "slotmachine.discount.vip1"
+    percentage: 10
+  vip2:
+    permission: "slotmachine.discount.vip2"
+    percentage: 25
+
 messages:
   prefix: "&e&lSlots &8» "
   no_permission: "&cNo tienes permiso para usar este comando."
@@ -77,8 +86,7 @@ messages:
   delete_success: "&aMaquina tragamonedas '{name}' borrada exitosamente."
   machine_not_found: "&cNo se encontró ninguna máquina con el nombre '{name}'."
   invalid_sign_format: "&cFormato de cartel incorrecto. Linea 3: precio por ficha."
-  
-# --- Sonidos ---
+
 sounds:
   spin: "BLOCK_NOTE_BLOCK_PLING"
   win: "ENTITY_PLAYER_LEVELUP"
@@ -87,16 +95,15 @@ sounds:
   jackpot_win: "UI_TOAST_CHALLENGE_COMPLETE"
   gui_click: "UI_BUTTON_CLICK"
 
-# --- Ruleta y Premios Fijos ---
 roulette_items:
-  - "DIAMOND"
-  - "EMERALD"
-  - "GOLD_INGOT"
-  - "IRON_INGOT"
-  - "LAPIS_LAZULI"
-  - "REDSTONE"
-  - "COAL"
-  - "CHERRY_SAPLING"
+  CHERRY_SAPLING: 60
+  COAL: 50
+  REDSTONE: 40
+  LAPIS_LAZULI: 35
+  IRON_INGOT: 25
+  GOLD_INGOT: 15
+  EMERALD: 8
+  DIAMOND: 3
 
 prizes:
   jackpot_emerald:

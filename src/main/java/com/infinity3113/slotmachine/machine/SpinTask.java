@@ -20,32 +20,34 @@ public class SpinTask extends BukkitRunnable {
     private final SlotMachinePlugin plugin;
     private final SlotMachine machine;
     private final Player player;
-    private final List<Material> rouletteItems;
     private final ItemFrame[] frames;
     private final Sound spinSound;
+
+    private final TreeMap<Integer, Material> weightedItems = new TreeMap<>();
+    private int totalWeight = 0;
 
     private int ticks = 0;
     private final int[] stopTicks = new int[3];
     private final Material[] finalResult = new Material[3];
     private boolean[] stopped = {false, false, false};
+    private final int timeoutTicks;
 
     public SpinTask(SlotMachinePlugin plugin, SlotMachine machine, Player player) {
         this.plugin = plugin;
         this.machine = machine;
         this.player = player;
         this.frames = machine.getItemFrames();
-        this.rouletteItems = new ArrayList<>();
-        plugin.getConfig().getStringList("roulette_items").forEach(s -> {
-            try {
-                rouletteItems.add(Material.valueOf(s.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Item invalido en roulette_items: " + s);
-            }
-        });
+        
+        loadWeightedItems();
 
-        this.stopTicks[0] = 60 + ThreadLocalRandom.current().nextInt(20);
-        this.stopTicks[1] = this.stopTicks[0] + 20 + ThreadLocalRandom.current().nextInt(20);
-        this.stopTicks[2] = this.stopTicks[1] + 20 + ThreadLocalRandom.current().nextInt(20);
+        int baseTicks = plugin.getConfig().getInt("machine_settings.spin_duration.base_ticks", 60);
+        int reelDelay = plugin.getConfig().getInt("machine_settings.spin_duration.reel_delay_ticks", 20);
+        int extraRandom = plugin.getConfig().getInt("machine_settings.spin_duration.extra_random_ticks", 20);
+        this.timeoutTicks = plugin.getConfig().getInt("machine_settings.spin_duration.timeout_seconds", 15) * 20;
+
+        this.stopTicks[0] = baseTicks + ThreadLocalRandom.current().nextInt(extraRandom);
+        this.stopTicks[1] = this.stopTicks[0] + reelDelay + ThreadLocalRandom.current().nextInt(extraRandom);
+        this.stopTicks[2] = this.stopTicks[1] + reelDelay + ThreadLocalRandom.current().nextInt(extraRandom);
 
         Sound sound;
         try {
@@ -56,9 +58,27 @@ public class SpinTask extends BukkitRunnable {
         this.spinSound = sound;
     }
 
+    private void loadWeightedItems() {
+        ConfigurationSection itemsSection = plugin.getConfig().getConfigurationSection("roulette_items");
+        if(itemsSection == null) return;
+        
+        for(String key : itemsSection.getKeys(false)) {
+            try {
+                Material material = Material.valueOf(key.toUpperCase());
+                int weight = itemsSection.getInt(key);
+                if(weight > 0) {
+                    totalWeight += weight;
+                    weightedItems.put(totalWeight, material);
+                }
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Item invalido en roulette_items: " + key);
+            }
+        }
+    }
+
     @Override
     public void run() {
-        if (rouletteItems.isEmpty()) {
+        if (weightedItems.isEmpty()) {
             MessageUtil.sendMessage(player, "&cError: No hay items configurados para la ruleta.");
             stop();
             return;
@@ -86,14 +106,13 @@ public class SpinTask extends BukkitRunnable {
             stop();
         }
 
-        if (ticks > 20 * 15) {
+        if (ticks > timeoutTicks) {
             MessageUtil.sendMessage(player, "&cLa maquina se ha atascado. Intentalo de nuevo.");
             stop();
         }
     }
 
     private void checkWin() {
-        // Primero, comprobar si se ganó el bote
         if (plugin.getConfig().getBoolean("jackpot.enabled")) {
             String[] jackpotCombo = plugin.getConfig().getString("jackpot.combination", "DIAMOND,DIAMOND,DIAMOND").split(",");
             if (isCombination(jackpotCombo)) {
@@ -106,14 +125,12 @@ public class SpinTask extends BukkitRunnable {
                 MessageUtil.sendMessage(player, jackpotWinMsg);
                 playSound("jackpot_win");
 
-                // Reiniciar el bote
                 double startingAmount = plugin.getConfig().getDouble("jackpot.starting_amount", 500.0);
                 machine.setCurrentJackpot(startingAmount);
-                return; // Ganó el bote, no se dan otros premios
+                return;
             }
         }
 
-        // Si no ganó el bote, comprobar premios fijos
         ConfigurationSection prizesSection = plugin.getConfig().getConfigurationSection("prizes");
         if (prizesSection != null) {
             for (String key : prizesSection.getKeys(false)) {
@@ -131,8 +148,7 @@ public class SpinTask extends BukkitRunnable {
                 }
             }
         }
-
-        // Si no ganó nada
+        
         MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.lose_message"));
         playSound("lose");
     }
@@ -140,21 +156,23 @@ public class SpinTask extends BukkitRunnable {
     private boolean isCombination(String[] combination) {
         if (combination.length != 3) return false;
         
-        Material[] currentResult = {finalResult[0], finalResult[1], finalResult[2]};
-        boolean[] resultUsed = {false, false, false};
-
-        for (int i = 0; i < 3; i++) {
+        List<Material> results = new ArrayList<>(Arrays.asList(finalResult));
+        
+        for(String comboItemName : combination) {
             boolean matchFound = false;
-            for (int j = 0; j < 3; j++) {
-                if (!resultUsed[j]) {
-                    if (combination[i].equalsIgnoreCase("ANY") || currentResult[j].name().equalsIgnoreCase(combination[i])) {
-                        resultUsed[j] = true;
-                        matchFound = true;
-                        break;
-                    }
+            if (comboItemName.equalsIgnoreCase("ANY")) {
+                if(!results.isEmpty()){
+                    results.remove(0);
+                    matchFound = true;
+                }
+            } else {
+                Material comboMaterial = Material.matchMaterial(comboItemName);
+                if (comboMaterial != null && results.contains(comboMaterial)) {
+                    results.remove(comboMaterial);
+                    matchFound = true;
                 }
             }
-            if (!matchFound) return false;
+            if(!matchFound) return false;
         }
         return true;
     }
@@ -165,7 +183,9 @@ public class SpinTask extends BukkitRunnable {
     }
 
     private Material getRandomItem() {
-        return rouletteItems.get(ThreadLocalRandom.current().nextInt(rouletteItems.size()));
+        if (totalWeight == 0) return Material.BARRIER;
+        int r = ThreadLocalRandom.current().nextInt(totalWeight);
+        return weightedItems.higherEntry(r).getValue();
     }
     
     private void playSound(String soundKey) {
