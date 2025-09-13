@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +38,7 @@ public class GuiListener implements Listener {
         Inventory clickedInventory = event.getClickedInventory();
         ItemStack clickedItem = event.getCurrentItem();
 
-        if (clickedInventory == null || clickedInventory.equals(player.getInventory()) || clickedItem == null) {
+        if (clickedItem == null || clickedInventory == null || !clickedInventory.equals(menu.getInventory())) {
             return;
         }
         
@@ -80,7 +81,7 @@ public class GuiListener implements Listener {
 
         Economy economy = plugin.getEconomyManager().getEconomy();
         if (economy.getBalance(player) < totalCost) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.not_enough_money"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.not_enough_money"));
             return;
         }
 
@@ -90,12 +91,17 @@ public class GuiListener implements Listener {
         player.getInventory().addItem(coins);
 
         String coinName = coins.getItemMeta().hasDisplayName() ? coins.getItemMeta().getDisplayName() : "Ficha";
-        MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.purchase_success")
-                .replace("{quantity}", String.valueOf(quantity))
-                .replace("{coin_name}", coinName)
-                .replace("{cost}", String.format("%,.2f", totalCost)));
+        MessageUtil.sendMessage(player, plugin.getLangManager().getFormattedString("messages.purchase_success",
+                "quantity", String.valueOf(quantity),
+                "coin_name", coinName,
+                "cost", String.format("%,.2f", totalCost)));
         
         player.closeInventory();
         openMenus.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        openMenus.remove(event.getPlayer().getUniqueId());
     }
 }

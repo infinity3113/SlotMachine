@@ -33,7 +33,7 @@ public class SlotMachineManager {
             try {
                 machinesFile.createNewFile();
             } catch (IOException e) {
-                plugin.getLogger().severe("No se pudo crear machines.yml: " + e.getMessage());
+                plugin.getLogger().severe("Could not create machines.yml: " + e.getMessage());
             }
         }
         machinesConfig = YamlConfiguration.loadConfiguration(machinesFile);
@@ -53,14 +53,14 @@ public class SlotMachineManager {
                     if (machine.isValid()) {
                         machinesByName.put(machine.getName().toLowerCase(), machine);
                     } else {
-                        plugin.getLogger().warning("No se pudo cargar la maquina '" + key + "' porque sus componentes no son validos en el mundo.");
+                        plugin.getLogger().warning("Could not load machine '" + key + "' because its components are not valid in the world.");
                     }
                 } catch (Exception e) {
-                    plugin.getLogger().severe("Error al cargar la maquina '" + key + "': " + e.getMessage());
+                    plugin.getLogger().severe("Error loading machine '" + key + "': " + e.getMessage());
                 }
             }
         }
-        plugin.getLogger().info(machinesByName.size() + " maquinas tragamonedas cargadas.");
+        plugin.getLogger().info(machinesByName.size() + " slot machines loaded.");
     }
 
     public void saveMachines() {
@@ -74,7 +74,7 @@ public class SlotMachineManager {
         try {
             machinesConfig.save(machinesFile);
         } catch (IOException e) {
-            plugin.getLogger().severe("No se pudo guardar machines.yml: " + e.getMessage());
+            plugin.getLogger().severe("Could not save machines.yml: " + e.getMessage());
         }
     }
 
@@ -111,9 +111,13 @@ public class SlotMachineManager {
         }
     }
     
+    public void removeAllHolograms() {
+        machinesByName.values().forEach(SlotMachine::removeHologram);
+    }
+    
     public void startCreation(Player player, String name) {
         if (getMachineByName(name) != null) {
-            MessageUtil.sendMessage(player, "&cYa existe una maquina con ese nombre.");
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.machine_already_exists"));
             return;
         }
         creationMode.put(player.getUniqueId(), player);

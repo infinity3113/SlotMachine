@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays; // <-- IMPORTACIÓN AÑADIDA
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SlotCommand implements CommandExecutor, TabCompleter {
 
@@ -29,7 +29,7 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("slotmachine.admin")) {
-            MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.no_permission"));
+            MessageUtil.sendMessage(sender, plugin.getLangManager().getString("messages.no_permission"));
             return true;
         }
 
@@ -50,7 +50,7 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
                 break;
             case "reload":
                 plugin.reloadPluginConfig();
-                MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.reload_success"));
+                MessageUtil.sendMessage(sender, plugin.getLangManager().getString("messages.reload_success"));
                 break;
             default:
                 sendHelp(sender);
@@ -61,7 +61,7 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
 
     private void handleCreate(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.player_only"));
+            MessageUtil.sendMessage(sender, plugin.getLangManager().getString("messages.player_only"));
             return;
         }
         if (args.length < 2) {
@@ -72,7 +72,7 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
         String machineName = args[1];
         
         machineManager.startCreation(player, machineName);
-        MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.creation_start"));
+        MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.creation_start"));
     }
 
     private void handleDelete(CommandSender sender, String[] args) {
@@ -82,17 +82,17 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
         }
         String machineName = args[1];
         if (machineManager.getMachineByName(machineName) == null) {
-            MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.machine_not_found").replace("{name}", machineName));
+            MessageUtil.sendMessage(sender, plugin.getLangManager().getFormattedString("messages.machine_not_found", "name", machineName));
             return;
         }
         
         machineManager.deleteMachine(machineName);
-        MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.delete_success").replace("{name}", machineName));
+        MessageUtil.sendMessage(sender, plugin.getLangManager().getFormattedString("messages.delete_success", "name", machineName));
     }
 
     private void handleGetCoin(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            MessageUtil.sendMessage(sender, plugin.getConfig().getString("messages.player_only"));
+            MessageUtil.sendMessage(sender, plugin.getLangManager().getString("messages.player_only"));
             return;
         }
         Player player = (Player) sender;
@@ -111,12 +111,12 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
         player.getInventory().addItem(coin);
 
         String coinName = coin.getItemMeta().hasDisplayName() ? coin.getItemMeta().getDisplayName() : "Ficha";
-        MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.coin_received")
-                .replace("{amount}", String.valueOf(amount))
-                .replace("{coin_name}", coinName));
+        MessageUtil.sendMessage(player, plugin.getLangManager().getFormattedString("messages.coin_received", 
+                "amount", String.valueOf(amount), "coin_name", coinName));
     }
 
     public static ItemStack getCoinItem() {
+        // Asegúrate de que tu clase principal (SlotMachinePlugin) tenga un método estático getInstance()
         SlotMachinePlugin plugin = SlotMachinePlugin.getInstance();
         String materialName = plugin.getConfig().getString("coin.material", "GOLD_NUGGET");
         Material material = Material.matchMaterial(materialName);
@@ -126,10 +126,8 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
         ItemMeta meta = coin.getItemMeta();
         
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.colorize(plugin.getConfig().getString("coin.name")));
-            List<String> lore = plugin.getConfig().getStringList("coin.lore").stream()
-                    .map(MessageUtil::colorize)
-                    .collect(Collectors.toList());
+            meta.setDisplayName(plugin.getLangManager().getString("coin.name"));
+            List<String> lore = plugin.getLangManager().getStringList("coin.lore");
             meta.setLore(lore);
             coin.setItemMeta(meta);
         }
@@ -147,7 +145,8 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return List.of("create", "delete", "getcoin", "reload");
+            // CAMBIO: Se usa Arrays.asList en lugar de List.of para compatibilidad con Java 8
+            return Arrays.asList("create", "delete", "getcoin", "reload");
         }
         return new ArrayList<>();
     }

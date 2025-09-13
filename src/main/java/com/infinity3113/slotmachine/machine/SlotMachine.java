@@ -1,23 +1,24 @@
 package com.infinity3113.slotmachine.machine;
 
 import com.infinity3113.slotmachine.SlotMachinePlugin;
-import com.infinity3113.slotmachine.util.MessageUtil;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class SlotMachine {
 
@@ -31,8 +32,7 @@ public class SlotMachine {
     private BukkitTask spinTask;
     
     private double currentJackpot;
-    private UUID hologramUuid;
-    private ArmorStand hologram;
+    private final String hologramName;
 
     public SlotMachine(SlotMachinePlugin plugin, ConfigurationSection section) {
         this.plugin = plugin;
@@ -42,12 +42,10 @@ public class SlotMachine {
         this.frameUuids = uuidStrings.stream().map(UUID::fromString).toArray(UUID[]::new);
         this.itemFrames = new ItemFrame[3];
         this.currentJackpot = section.getDouble("currentJackpot", plugin.getConfig().getDouble("jackpot.starting_amount", 500.0));
-        String uuidStr = section.getString("hologramUuid");
-        if (uuidStr != null) {
-            this.hologramUuid = UUID.fromString(uuidStr);
-        }
+        this.hologramName = "slm-" + this.name.toLowerCase().replace(" ", "_");
+        
         fetchFrameEntities();
-        fetchHologram();
+        createOrUpdateHologram();
     }
     
     public SlotMachine(SlotMachinePlugin plugin, String name, Location jukeboxLocation, List<UUID> frameUuids) {
@@ -57,8 +55,10 @@ public class SlotMachine {
         this.frameUuids = frameUuids.toArray(new UUID[0]);
         this.itemFrames = new ItemFrame[3];
         this.currentJackpot = plugin.getConfig().getDouble("jackpot.starting_amount", 500.0);
+        this.hologramName = "slm-" + this.name.toLowerCase().replace(" ", "_");
+
         fetchFrameEntities();
-        createHologram();
+        createOrUpdateHologram();
     }
 
     private void fetchFrameEntities() {
@@ -70,39 +70,34 @@ public class SlotMachine {
         }
     }
 
-    private void fetchHologram() {
-        if (hologramUuid != null) {
-            Entity entity = Bukkit.getEntity(hologramUuid);
-            if (entity instanceof ArmorStand) {
-                this.hologram = (ArmorStand) entity;
-                updateHologram();
+    public void createOrUpdateHologram() {
+        if (!plugin.getConfig().getBoolean("jackpot.enabled", true)) return;
+
+        Location hologramLoc = jukeboxLocation.clone().add(0.5, 1.8, 0.5); 
+        Hologram hologram = DHAPI.getHologram(hologramName);
+        
+        DecimalFormat df = new DecimalFormat("#,##0.00");
+        String amountStr = df.format(this.currentJackpot);
+
+        List<String> lines = plugin.getLangManager().getStringList("jackpot.hologram_lines").stream()
+                .map(line -> line.replace("{amount}", amountStr))
+                .collect(Collectors.toList());
+
+        if (hologram == null) {
+            DHAPI.createHologram(hologramName, hologramLoc, lines);
+        } else {
+            DHAPI.setHologramLines(hologram, lines);
+            if (!hologram.getLocation().equals(hologramLoc)) {
+                // CAMBIO: Se usa DHAPI.moveHologram en lugar de hologram.teleport
+                DHAPI.moveHologram(hologramName, hologramLoc);
             }
         }
     }
 
-    private void createHologram() {
-        if (!plugin.getConfig().getBoolean("jackpot.enabled", true)) return;
-        Location hologramLoc = jukeboxLocation.clone().add(0.5, 1.5, 0.5); 
-        this.hologram = (ArmorStand) jukeboxLocation.getWorld().spawnEntity(hologramLoc, EntityType.ARMOR_STAND);
-        this.hologram.setVisible(false);
-        this.hologram.setGravity(false);
-        this.hologram.setCustomNameVisible(true);
-        this.hologram.setMarker(true);
-        this.hologramUuid = this.hologram.getUniqueId();
-        updateHologram();
-    }
-
-    public void updateHologram() {
-        if (hologram == null || hologram.isDead() || !plugin.getConfig().getBoolean("jackpot.enabled", true)) return;
-        DecimalFormat df = new DecimalFormat("#,##0.00");
-        String text = plugin.getConfig().getString("jackpot.hologram_text", "&e&lBote: &a${amount}");
-        text = text.replace("{amount}", df.format(this.currentJackpot));
-        hologram.setCustomName(MessageUtil.colorize(text));
-    }
-
     public void removeHologram() {
-        if (hologram != null && !hologram.isDead()) {
-            hologram.remove();
+        Hologram hologram = DHAPI.getHologram(hologramName);
+        if (hologram != null) {
+            hologram.delete();
         }
     }
 
@@ -124,7 +119,7 @@ public class SlotMachine {
         if (plugin.getConfig().getBoolean("jackpot.enabled")) {
             double contribution = coinValue * (plugin.getConfig().getInt("machine_settings.play_cost", 1));
             this.currentJackpot += contribution;
-            updateHologram();
+            createOrUpdateHologram();
             plugin.getSlotMachineManager().saveMachines();
         }
 
@@ -132,10 +127,10 @@ public class SlotMachine {
         this.spinTask = new SpinTask(plugin, this, player).runTaskTimer(plugin, 0L, 2L);
         
         try {
-            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.coin_insert", "ENTITY_ITEM_PICKUP"));
+            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.coin_insert", "ENTITY_ITEM_PICKUP").toUpperCase());
             player.playSound(player.getLocation(), sound, 1f, 1f);
         } catch (Exception e) {
-            plugin.getLogger().warning("Sonido 'coin_insert' invalido en config.yml");
+            plugin.getLogger().warning("Invalid 'coin_insert' sound in config.yml");
         }
     }
 
@@ -162,10 +157,7 @@ public class SlotMachine {
 
     public void save(ConfigurationSection section) {
         section.set("jukeboxLocation", jukeboxLocation);
-        section.set("frameUuids", List.of(frameUuids[0].toString(), frameUuids[1].toString(), frameUuids[2].toString()));
-        if (hologramUuid != null) {
-            section.set("hologramUuid", hologramUuid.toString());
-        }
+        section.set("frameUuids", Arrays.asList(frameUuids[0].toString(), frameUuids[1].toString(), frameUuids[2].toString()));
         section.set("currentJackpot", currentJackpot);
     }
 
@@ -177,7 +169,7 @@ public class SlotMachine {
     public double getCurrentJackpot() { return currentJackpot; }
     public void setCurrentJackpot(double amount) {
         this.currentJackpot = amount;
-        updateHologram();
+        createOrUpdateHologram();
         plugin.getSlotMachineManager().saveMachines();
     }
 }

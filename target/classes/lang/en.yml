@@ -1,0 +1,78 @@
+coin:
+  name: "&6&lCasino Token"
+  lore:
+    - "&7Use this token on a"
+    - "&7slot machine."
+
+buy_sign:
+  line1: "[Slots]"
+  line2: "Buy Tokens"
+
+purchase_gui:
+  title: "&1Buy Casino Tokens"
+  info_item:
+    name: "&ePurchase Information"
+    lore:
+      - "&7Amount: &b{quantity}"
+      - "{discount_line}"
+      - "&7Total Cost: &a${cost}"
+      - ""
+      - "&7Your Balance: &a${balance}"
+  discount_line_format: "&7Discount ({percentage}%): &c-${discount_amount}"
+  confirm_item:
+    name: "&a&lConfirm Purchase"
+  cancel_item:
+    name: "&c&lCancel"
+  add_one_item:
+    name: "&a+1 Token"
+  remove_one_item:
+    name: "&c-1 Token"
+  add_ten_item:
+    name: "&a+10 Tokens"
+  remove_ten_item:
+    name: "&c-10 Tokens"
+  set_max_item:
+    name: "&bBuy maximum possible"
+
+messages:
+  prefix: "&e&lSlots &8» "
+  no_permission: "&cYou do not have permission to use this command."
+  player_only: "&cThis command can only be run by a player."
+  reload_success: "&aConfiguration reloaded successfully."
+  coin_received: "&aYou have received {amount}x {coin_name}&a."
+  not_enough_coins: "&cYou don't have enough tokens. You need {amount}x {coin_name}&c."
+  not_enough_money: "&cYou do not have enough money to purchase this."
+  purchase_success: "&aYou bought {quantity}x {coin_name} &afor &e${cost}&a."
+  machine_in_use: "&cThis machine is already in use. Please wait."
+  win_message: "&a&lYOU WON! &fYou've won &e${reward}&f."
+  lose_message: "&cBad luck! Try again."
+  creation_start: "&aYou have started creation mode. Right-click a Jukebox."
+  creation_click_frame: "&aJukebox selected. Now right-click the 3 Item Frames in order."
+  creation_success: "&aSlot machine '{name}' created successfully!"
+  creation_cancel: "&cCreation cancelled."
+  delete_success: "&aSlot machine '{name}' deleted successfully."
+  machine_not_found: "&cNo machine found with the name '{name}'."
+  machine_already_exists: "&cMachine with that name already exists."
+  invalid_sign_format: "&cIncorrect sign format. Line 3: price per token."
+  need_coin_to_play: "&cYou need a {coin_name} &cto play."
+  machine_stuck: "&cThe machine got stuck. Please try again."
+  no_roulette_items: "&cError: No items configured for the roulette."
+  
+jackpot:
+  hologram_lines:
+    - "&e&lJackpot"
+    - "&a${amount}"
+  win_message: "&6&lJACKPOT!!! &fYou won the jackpot of &e${amount}&f!"
+  combination: "DIAMOND,DIAMOND,DIAMOND"
+
+prizes:
+  jackpot_emerald:
+    combination: "EMERALD,EMERALD,EMERALD"
+  gold_win:
+    combination: "GOLD_INGOT,GOLD_INGOT,GOLD_INGOT"
+  iron_win:
+    combination: "IRON_INGOT,IRON_INGOT,IRON_INGOT"
+  two_diamonds:
+    combination: "DIAMOND,DIAMOND,ANY"
+  two_emeralds:
+    combination: "EMERALD,EMERALD,ANY"

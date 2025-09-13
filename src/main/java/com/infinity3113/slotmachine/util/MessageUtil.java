@@ -14,7 +14,7 @@ public class MessageUtil {
     public static void sendMessage(CommandSender sender, String message) {
         if (message == null || message.isEmpty()) return;
         
-        String prefix = SlotMachinePlugin.getInstance().getConfig().getString("messages.prefix", "&e&lSlots &8» ");
+        String prefix = SlotMachinePlugin.getInstance().getLangManager().getString("messages.prefix");
         sender.sendMessage(colorize(prefix + message));
     }
 }

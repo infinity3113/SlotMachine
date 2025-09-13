@@ -1,9 +1,4 @@
-coin:
-  material: "GOLD_NUGGET"
-  name: "&6&lFicha de Casino"
-  lore:
-    - "&7Usa esta ficha en una"
-    - "&7maquina tragamonedas."
+language: "es"
 
 machine_settings:
   play_cost: 1
@@ -17,47 +12,6 @@ machine_settings:
 jackpot:
   enabled: true
   starting_amount: 500.0
-  combination: "DIAMOND,DIAMOND,DIAMOND"
-  hologram_text: "&e&lBote: &a${amount}"
-  win_message: "&6&l¡¡¡JACKPOT!!! &f¡Has ganado el bote de &e${amount}&f!"
-
-buy_sign:
-  line1: "[Tragamonedas]"
-  line2: "Comprar Fichas"
-
-purchase_gui:
-  title: "&1Comprar Fichas de Casino"
-  info_item:
-    material: "PAPER"
-    name: "&eInformación de Compra"
-    lore:
-      - "&7Cantidad: &b{quantity}"
-      - "{discount_line}"
-      - "&7Costo Total: &a${cost}"
-      - ""
-      - "&7Tu Saldo: &a${balance}"
-  discount_line_format: "&7Descuento ({percentage}%): &c-${discount_amount}"
-  confirm_item:
-    material: "EMERALD_BLOCK"
-    name: "&a&lConfirmar Compra"
-  cancel_item:
-    material: "BARRIER"
-    name: "&c&lCancelar"
-  add_one_item:
-    material: "GREEN_STAINED_GLASS_PANE"
-    name: "&a+1 Ficha"
-  remove_one_item:
-    material: "RED_STAINED_GLASS_PANE"
-    name: "&c-1 Ficha"
-  add_ten_item:
-    material: "GREEN_WOOL"
-    name: "&a+10 Fichas"
-  remove_ten_item:
-    material: "RED_WOOL"
-    name: "&c-10 Fichas"
-  set_max_item:
-    material: "DIAMOND"
-    name: "&bComprar el máximo posible"
 
 purchase_discounts:
   vip1:
@@ -66,26 +20,6 @@ purchase_discounts:
   vip2:
     permission: "slotmachine.discount.vip2"
     percentage: 25
-
-messages:
-  prefix: "&e&lSlots &8» "
-  no_permission: "&cNo tienes permiso para usar este comando."
-  player_only: "&cEste comando solo puede ser ejecutado por un jugador."
-  reload_success: "&aConfiguracion recargada exitosamente."
-  coin_received: "&aHas recibido {amount}x {coin_name}&a."
-  not_enough_coins: "&cNo tienes suficientes fichas para jugar. Necesitas {amount}x {coin_name}&c."
-  not_enough_money: "&cNo tienes suficiente dinero para comprar esto."
-  purchase_success: "&aHas comprado {quantity}x {coin_name} &apor &e${cost}&a."
-  machine_in_use: "&cEsta maquina ya esta en uso. Por favor, espera."
-  win_message: "&a&l¡GANASTE! &fHas ganado &e${reward}&f."
-  lose_message: "&c¡Mala suerte! Intentalo de nuevo."
-  creation_start: "&aHas iniciado el modo de creacion. Haz clic derecho en una Caja de Musica (Jukebox)."
-  creation_click_frame: "&aCaja de Musica seleccionada. Ahora haz clic derecho en los 3 Marcos (Item Frames) en orden."
-  creation_success: "&a¡Maquina tragamonedas '{name}' creada exitosamente!"
-  creation_cancel: "&cCreacion cancelada."
-  delete_success: "&aMaquina tragamonedas '{name}' borrada exitosamente."
-  machine_not_found: "&cNo se encontró ninguna máquina con el nombre '{name}'."
-  invalid_sign_format: "&cFormato de cartel incorrecto. Linea 3: precio por ficha."
 
 sounds:
   spin: "BLOCK_NOTE_BLOCK_PLING"
@@ -107,17 +41,12 @@ roulette_items:
 
 prizes:
   jackpot_emerald:
-    combination: "EMERALD,EMERALD,EMERALD"
     reward: 5000.0
   gold_win:
-    combination: "GOLD_INGOT,GOLD_INGOT,GOLD_INGOT"
     reward: 1000.0
   iron_win:
-    combination: "IRON_INGOT,IRON_INGOT,IRON_INGOT"
     reward: 500.0
   two_diamonds:
-    combination: "DIAMOND,DIAMOND,ANY"
     reward: 250.0
   two_emeralds:
-    combination: "EMERALD,EMERALD,ANY"
     reward: 100.0

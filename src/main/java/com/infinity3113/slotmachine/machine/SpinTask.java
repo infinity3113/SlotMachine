@@ -51,7 +51,7 @@ public class SpinTask extends BukkitRunnable {
 
         Sound sound;
         try {
-            sound = Sound.valueOf(plugin.getConfig().getString("sounds.spin", "BLOCK_NOTE_BLOCK_PLING"));
+            sound = Sound.valueOf(plugin.getConfig().getString("sounds.spin", "BLOCK_NOTE_BLOCK_PLING").toUpperCase());
         } catch (Exception e) {
             sound = Sound.BLOCK_NOTE_BLOCK_PLING;
         }
@@ -71,7 +71,7 @@ public class SpinTask extends BukkitRunnable {
                     weightedItems.put(totalWeight, material);
                 }
             } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("Item invalido en roulette_items: " + key);
+                plugin.getLogger().warning("Invalid item in roulette_items: " + key);
             }
         }
     }
@@ -79,7 +79,7 @@ public class SpinTask extends BukkitRunnable {
     @Override
     public void run() {
         if (weightedItems.isEmpty()) {
-            MessageUtil.sendMessage(player, "&cError: No hay items configurados para la ruleta.");
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.no_roulette_items"));
             stop();
             return;
         }
@@ -107,21 +107,21 @@ public class SpinTask extends BukkitRunnable {
         }
 
         if (ticks > timeoutTicks) {
-            MessageUtil.sendMessage(player, "&cLa maquina se ha atascado. Intentalo de nuevo.");
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.machine_stuck"));
             stop();
         }
     }
 
     private void checkWin() {
         if (plugin.getConfig().getBoolean("jackpot.enabled")) {
-            String[] jackpotCombo = plugin.getConfig().getString("jackpot.combination", "DIAMOND,DIAMOND,DIAMOND").split(",");
+            String[] jackpotCombo = plugin.getLangManager().getString("jackpot.combination").split(",");
             if (isCombination(jackpotCombo)) {
                 double jackpotAmount = machine.getCurrentJackpot();
                 Economy economy = plugin.getEconomyManager().getEconomy();
                 economy.depositPlayer(player, jackpotAmount);
 
                 DecimalFormat df = new DecimalFormat("#,##0.00");
-                String jackpotWinMsg = plugin.getConfig().getString("jackpot.win_message").replace("{amount}", df.format(jackpotAmount));
+                String jackpotWinMsg = plugin.getLangManager().getFormattedString("jackpot.win_message", "amount", df.format(jackpotAmount));
                 MessageUtil.sendMessage(player, jackpotWinMsg);
                 playSound("jackpot_win");
 
@@ -134,14 +134,14 @@ public class SpinTask extends BukkitRunnable {
         ConfigurationSection prizesSection = plugin.getConfig().getConfigurationSection("prizes");
         if (prizesSection != null) {
             for (String key : prizesSection.getKeys(false)) {
-                String[] combination = prizesSection.getString(key + ".combination", "").split(",");
+                String[] combination = plugin.getLangManager().getString("prizes." + key + ".combination").split(",");
                 if (isCombination(combination)) {
                     double reward = prizesSection.getDouble(key + ".reward");
                     Economy economy = plugin.getEconomyManager().getEconomy();
                     economy.depositPlayer(player, reward);
 
                     DecimalFormat df = new DecimalFormat("#,##0.00");
-                    String winMessage = plugin.getConfig().getString("messages.win_message").replace("{reward}", df.format(reward));
+                    String winMessage = plugin.getLangManager().getFormattedString("messages.win_message", "reward", df.format(reward));
                     MessageUtil.sendMessage(player, winMessage);
                     playSound("win");
                     return;
@@ -149,7 +149,7 @@ public class SpinTask extends BukkitRunnable {
             }
         }
         
-        MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.lose_message"));
+        MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.lose_message"));
         playSound("lose");
     }
 
@@ -193,7 +193,7 @@ public class SpinTask extends BukkitRunnable {
             Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds." + soundKey).toUpperCase());
             player.playSound(player.getLocation(), sound, 1f, 1f);
         } catch (Exception e) {
-            plugin.getLogger().warning("Sonido '" + soundKey + "' invalido en config.yml");
+            plugin.getLogger().warning("Invalid sound '" + soundKey + "' in config.yml");
         }
     }
 }

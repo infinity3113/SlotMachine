@@ -1,7 +1,7 @@
 package com.infinity3113.slotmachine.gui;
 
 import com.infinity3113.slotmachine.SlotMachinePlugin;
-import com.infinity3113.slotmachine.util.MessageUtil;
+import com.infinity3113.slotmachine.util.LangManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -49,7 +49,7 @@ public class PurchaseMenu {
     }
 
     private void createInventory() {
-        String title = MessageUtil.colorize(plugin.getConfig().getString("purchase_gui.title", "&1Comprar Fichas"));
+        String title = plugin.getLangManager().getString("purchase_gui.title");
         this.inventory = Bukkit.createInventory(null, 45, title);
     }
 
@@ -58,18 +58,22 @@ public class PurchaseMenu {
         player.openInventory(this.inventory);
         GuiListener.openMenus.put(player.getUniqueId(), this);
     }
+    
+    public Inventory getInventory() {
+        return inventory;
+    }
 
     private void updateItems(Player player) {
         inventory.clear();
         
-        inventory.setItem(10, createGuiItem("remove_ten_item"));
-        inventory.setItem(11, createGuiItem("remove_one_item"));
-        inventory.setItem(15, createGuiItem("add_one_item"));
-        inventory.setItem(16, createGuiItem("add_ten_item"));
-        inventory.setItem(22, createGuiItem("set_max_item"));
+        inventory.setItem(10, createGuiItem("remove_ten_item", "RED_WOOL"));
+        inventory.setItem(11, createGuiItem("remove_one_item", "RED_STAINED_GLASS_PANE"));
+        inventory.setItem(15, createGuiItem("add_one_item", "GREEN_STAINED_GLASS_PANE"));
+        inventory.setItem(16, createGuiItem("add_ten_item", "GREEN_WOOL"));
+        inventory.setItem(22, createGuiItem("set_max_item", "DIAMOND"));
         
-        inventory.setItem(30, createGuiItem("cancel_item"));
-        inventory.setItem(32, createGuiItem("confirm_item"));
+        inventory.setItem(30, createGuiItem("cancel_item", "BARRIER"));
+        inventory.setItem(32, createGuiItem("confirm_item", "EMERALD_BLOCK"));
 
         updateInfoItem(player);
     }
@@ -80,25 +84,26 @@ public class PurchaseMenu {
         double totalCost = getTotalCost();
         double originalCost = quantity * pricePerCoin;
         double discountAmount = originalCost - totalCost;
+        LangManager lang = plugin.getLangManager();
 
         DecimalFormat df = new DecimalFormat("#,##0.00");
-        ItemStack infoItem = createGuiItem("info_item");
+        ItemStack infoItem = createGuiItem("info_item", "PAPER");
         ItemMeta meta = infoItem.getItemMeta();
         if (meta != null) {
             List<String> lore = new ArrayList<>();
-            for (String line : plugin.getConfig().getStringList("purchase_gui.info_item.lore")) {
+            for (String line : lang.getStringList("purchase_gui.info_item.lore")) {
                 if (line.contains("{discount_line}") && discountPercentage > 0) {
-                    String discountFormat = plugin.getConfig().getString("purchase_gui.discount_line_format", "&7Descuento ({percentage}%): &c-${discount_amount}");
-                    lore.add(MessageUtil.colorize(discountFormat
+                    String discountFormat = lang.getString("purchase_gui.discount_line_format");
+                    lore.add(discountFormat
                         .replace("{percentage}", String.valueOf((int)discountPercentage))
                         .replace("{discount_amount}", df.format(discountAmount))
-                    ));
+                    );
                 } else if (!line.contains("{discount_line}")) {
-                    lore.add(MessageUtil.colorize(line
+                    lore.add(line
                             .replace("{quantity}", String.valueOf(quantity))
                             .replace("{cost}", df.format(totalCost))
                             .replace("{balance}", df.format(balance))
-                    ));
+                    );
                 }
             }
             meta.setLore(lore);
@@ -128,10 +133,9 @@ public class PurchaseMenu {
         updateInfoItem(player);
     }
 
-    private ItemStack createGuiItem(String configKey) {
-        String path = "purchase_gui." + configKey;
-        Material material = Material.valueOf(plugin.getConfig().getString(path + ".material", "STONE"));
-        String name = MessageUtil.colorize(plugin.getConfig().getString(path + ".name", ""));
+    private ItemStack createGuiItem(String langKey, String defaultMaterial) {
+        String name = plugin.getLangManager().getString("purchase_gui." + langKey + ".name");
+        Material material = Material.valueOf(defaultMaterial); 
         
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();

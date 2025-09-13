@@ -33,12 +33,12 @@ public class MachineUseListener implements Listener {
         event.setCancelled(true);
 
         if (!player.hasPermission("slotmachine.use")) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.no_permission"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.no_permission"));
             return;
         }
 
         if (machine.isSpinning()) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.machine_in_use"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.machine_in_use"));
             return;
         }
 
@@ -47,16 +47,16 @@ public class MachineUseListener implements Listener {
 
         if (!itemInHand.isSimilar(requiredCoin)) {
              String coinName = requiredCoin.getItemMeta().hasDisplayName() ? requiredCoin.getItemMeta().getDisplayName() : "Ficha";
-             MessageUtil.sendMessage(player, "&cNecesitas una " + coinName + " &cpara jugar.");
+             MessageUtil.sendMessage(player, plugin.getLangManager().getFormattedString("messages.need_coin_to_play", "coin_name", coinName));
             return;
         }
 
         int cost = plugin.getConfig().getInt("machine_settings.play_cost", 1);
         if (itemInHand.getAmount() < cost) {
              String coinName = requiredCoin.getItemMeta().hasDisplayName() ? requiredCoin.getItemMeta().getDisplayName() : "Ficha";
-             MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.not_enough_coins")
-                .replace("{amount}", String.valueOf(cost))
-                .replace("{coin_name}", coinName));
+             MessageUtil.sendMessage(player, plugin.getLangManager().getFormattedString("messages.not_enough_coins",
+                "amount", String.valueOf(cost),
+                "coin_name", coinName));
             return;
         }
         

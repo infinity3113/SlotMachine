@@ -7,6 +7,8 @@ import com.infinity3113.slotmachine.listener.MachineCreationListener;
 import com.infinity3113.slotmachine.listener.MachineUseListener;
 import com.infinity3113.slotmachine.listener.SignListener;
 import com.infinity3113.slotmachine.machine.SlotMachineManager;
+import com.infinity3113.slotmachine.util.LangManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -16,15 +18,24 @@ public final class SlotMachinePlugin extends JavaPlugin {
     private static SlotMachinePlugin instance;
     private EconomyManager economyManager;
     private SlotMachineManager slotMachineManager;
+    private LangManager langManager;
 
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
 
+        this.langManager = new LangManager(this);
+
         this.economyManager = new EconomyManager(this);
         if (!economyManager.setupEconomy()) {
-            getLogger().severe("Vault no encontrado o no hay un plugin de economia. Desactivando plugin.");
+            getLogger().severe("Vault not found or no economy plugin hooked. Disabling plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("DecentHolograms") == null) {
+            getLogger().severe("DecentHolograms not found! This plugin is required. Disabling plugin.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -38,19 +49,21 @@ public final class SlotMachinePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SignListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiListener(this), this);
 
-        getLogger().info("Plugin SlotMachine v3 activado exitosamente.");
+        getLogger().info("SlotMachine plugin enabled successfully.");
     }
 
     @Override
     public void onDisable() {
         if (slotMachineManager != null) {
             slotMachineManager.stopAllMachines();
+            slotMachineManager.removeAllHolograms();
         }
-        getLogger().info("Plugin SlotMachine desactivado.");
+        getLogger().info("SlotMachine plugin disabled.");
     }
 
     public void reloadPluginConfig() {
         reloadConfig();
+        this.langManager = new LangManager(this);
         slotMachineManager.loadMachines();
     }
 
@@ -64,5 +77,9 @@ public final class SlotMachinePlugin extends JavaPlugin {
 
     public SlotMachineManager getSlotMachineManager() {
         return slotMachineManager;
+    }
+    
+    public LangManager getLangManager() {
+        return langManager;
     }
 }

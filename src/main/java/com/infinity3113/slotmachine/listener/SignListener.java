@@ -24,13 +24,13 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignCreate(SignChangeEvent event) {
-        if (!event.getLine(0).equalsIgnoreCase(plugin.getConfig().getString("buy_sign.line1"))) {
+        if (!event.getLine(0).equalsIgnoreCase(plugin.getLangManager().getString("buy_sign.line1"))) {
             return;
         }
 
         Player player = event.getPlayer();
         if (!player.hasPermission("slotmachine.sign.create")) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.no_permission"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.no_permission"));
             event.setCancelled(true);
             return;
         }
@@ -38,13 +38,13 @@ public class SignListener implements Listener {
         try {
             Double.parseDouble(event.getLine(2));
         } catch (Exception e) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.invalid_sign_format"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.invalid_sign_format"));
             event.setLine(0, MessageUtil.colorize("&c[Error]"));
             return;
         }
 
-        event.setLine(0, MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line1")));
-        event.setLine(1, MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line2")));
+        event.setLine(0, plugin.getLangManager().getString("buy_sign.line1"));
+        event.setLine(1, plugin.getLangManager().getString("buy_sign.line2"));
         event.setLine(2, MessageUtil.colorize("&a$" + event.getLine(2)));
         event.setLine(3, "");
         MessageUtil.sendMessage(player, "&a¡Cartel de compra creado!");
@@ -57,7 +57,7 @@ public class SignListener implements Listener {
         if (clickedBlock == null || !(clickedBlock.getState() instanceof Sign)) return;
 
         Sign sign = (Sign) clickedBlock.getState();
-        if (!sign.getLine(0).equalsIgnoreCase(MessageUtil.colorize(plugin.getConfig().getString("buy_sign.line1")))) {
+        if (!sign.getLine(0).equalsIgnoreCase(plugin.getLangManager().getString("buy_sign.line1"))) {
             return;
         }
         
@@ -65,7 +65,7 @@ public class SignListener implements Listener {
 
         Player player = event.getPlayer();
         if (!player.hasPermission("slotmachine.sign.use")) {
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.no_permission"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.no_permission"));
             return;
         }
 

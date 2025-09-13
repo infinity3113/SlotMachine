@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -38,14 +39,14 @@ public class MachineCreationListener implements Listener {
 
         if (event.getClickedBlock().getType() == Material.JUKEBOX) {
             progress.setJukeboxLocation(event.getClickedBlock().getLocation());
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.creation_click_frame"));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.creation_click_frame"));
         } else {
             MessageUtil.sendMessage(player, "&cDebes hacer clic derecho en una Caja de Musica.");
         }
     }
     
     @EventHandler
-    public void onPlayerInteractEntity(org.bukkit.event.player.PlayerInteractEntityEvent event) {
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if (!manager.isInCreationMode(player)) return;
         
@@ -67,7 +68,7 @@ public class MachineCreationListener implements Listener {
         if (progress.isReady()) {
             SlotMachine newMachine = new SlotMachine(plugin, progress.getName(), progress.getJukeboxLocation(), progress.getFrameUuids());
             manager.addMachine(newMachine);
-            MessageUtil.sendMessage(player, plugin.getConfig().getString("messages.creation_success").replace("{name}", progress.getName()));
+            MessageUtil.sendMessage(player, plugin.getLangManager().getFormattedString("messages.creation_success", "name", progress.getName()));
             manager.cancelCreation(player);
         }
     }

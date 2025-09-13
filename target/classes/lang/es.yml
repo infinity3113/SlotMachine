@@ -1,0 +1,78 @@
+coin:
+  name: "&6&lFicha de Casino"
+  lore:
+    - "&7Usa esta ficha en una"
+    - "&7maquina tragamonedas."
+
+buy_sign:
+  line1: "[Tragamonedas]"
+  line2: "Comprar Fichas"
+
+purchase_gui:
+  title: "&1Comprar Fichas de Casino"
+  info_item:
+    name: "&eInformación de Compra"
+    lore:
+      - "&7Cantidad: &b{quantity}"
+      - "{discount_line}"
+      - "&7Costo Total: &a${cost}"
+      - ""
+      - "&7Tu Saldo: &a${balance}"
+  discount_line_format: "&7Descuento ({percentage}%): &c-${discount_amount}"
+  confirm_item:
+    name: "&a&lConfirmar Compra"
+  cancel_item:
+    name: "&c&lCancelar"
+  add_one_item:
+    name: "&a+1 Ficha"
+  remove_one_item:
+    name: "&c-1 Ficha"
+  add_ten_item:
+    name: "&a+10 Fichas"
+  remove_ten_item:
+    name: "&c-10 Fichas"
+  set_max_item:
+    name: "&bComprar el máximo posible"
+
+messages:
+  prefix: "&e&lSlots &8» "
+  no_permission: "&cNo tienes permiso para usar este comando."
+  player_only: "&cEste comando solo puede ser ejecutado por un jugador."
+  reload_success: "&aConfiguración recargada exitosamente."
+  coin_received: "&aHas recibido {amount}x {coin_name}&a."
+  not_enough_coins: "&cNo tienes suficientes fichas. Necesitas {amount}x {coin_name}&c."
+  not_enough_money: "&cNo tienes suficiente dinero para comprar esto."
+  purchase_success: "&aHas comprado {quantity}x {coin_name} &apor &e${cost}&a."
+  machine_in_use: "&cEsta máquina ya está en uso. Por favor, espera."
+  win_message: "&a&l¡GANASTE! &fHas ganado &e${reward}&f."
+  lose_message: "&c¡Mala suerte! Inténtalo de nuevo."
+  creation_start: "&aHas iniciado el modo de creación. Haz clic derecho en una Caja de Música (Jukebox)."
+  creation_click_frame: "&aCaja de Música seleccionada. Ahora haz clic derecho en los 3 Marcos (Item Frames) en orden."
+  creation_success: "&a¡Máquina tragamonedas '{name}' creada exitosamente!"
+  creation_cancel: "&cCreación cancelada."
+  delete_success: "&aMáquina tragamonedas '{name}' borrada exitosamente."
+  machine_not_found: "&cNo se encontró ninguna máquina con el nombre '{name}'."
+  machine_already_exists: "&cYa existe una máquina con ese nombre."
+  invalid_sign_format: "&cFormato de cartel incorrecto. Línea 3: precio por ficha."
+  need_coin_to_play: "&cNecesitas una {coin_name} &cpara jugar."
+  machine_stuck: "&cLa máquina se ha atascado. Inténtalo de nuevo."
+  no_roulette_items: "&cError: No hay ítems configurados para la ruleta."
+  
+jackpot:
+  hologram_lines:
+    - "&e&lBote"
+    - "&a${amount}"
+  win_message: "&6&l¡¡¡JACKPOT!!! &f¡Has ganado el bote de &e${amount}&f!"
+  combination: "DIAMOND,DIAMOND,DIAMOND"
+
+prizes:
+  jackpot_emerald:
+    combination: "EMERALD,EMERALD,EMERALD"
+  gold_win:
+    combination: "GOLD_INGOT,GOLD_INGOT,GOLD_INGOT"
+  iron_win:
+    combination: "IRON_INGOT,IRON_INGOT,IRON_INGOT"
+  two_diamonds:
+    combination: "DIAMOND,DIAMOND,ANY"
+  two_emeralds:
+    combination: "EMERALD,EMERALD,ANY"
