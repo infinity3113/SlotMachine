@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class SlotMachineManager {
@@ -29,6 +31,20 @@ public class SlotMachineManager {
 
     private void setupFiles() {
         machinesFile = new File(plugin.getDataFolder(), "machines.yml");
+        File backupFile = new File(plugin.getDataFolder(), "machines.yml.bak");
+
+        // Si el archivo principal no existe pero el backup sí, restaura el backup.
+        // Esto recupera los datos en caso de un crash durante el guardado.
+        if (!machinesFile.exists() && backupFile.exists()) {
+            plugin.getLogger().warning("Main machines file not found. Restoring from backup...");
+            try {
+                Files.copy(backupFile.toPath(), machinesFile.toPath());
+            } catch (IOException e) {
+                plugin.getLogger().severe("Could not restore backup file: " + e.getMessage());
+            }
+        }
+        
+        // Cargar la configuración desde el archivo (o crearlo si no existe)
         if (!machinesFile.exists()) {
             try {
                 machinesFile.createNewFile();
@@ -64,17 +80,44 @@ public class SlotMachineManager {
     }
 
     public void saveMachines() {
-        machinesConfig.set("machines", null);
-        ConfigurationSection machinesSection = machinesConfig.createSection("machines");
+        // Crear una nueva configuración en memoria para evitar modificar la actual mientras se guarda
+        FileConfiguration newConfig = new YamlConfiguration();
+        ConfigurationSection machinesSection = newConfig.createSection("machines");
 
         for (SlotMachine machine : machinesByName.values()) {
             ConfigurationSection machineSection = machinesSection.createSection(machine.getName());
             machine.save(machineSection);
         }
+
+        // Implementación del guardado seguro (atomic save)
+        File tempFile = new File(plugin.getDataFolder(), "machines.yml.tmp");
+        File backupFile = new File(plugin.getDataFolder(), "machines.yml.bak");
+
         try {
-            machinesConfig.save(machinesFile);
+            // 1. Escribir los nuevos datos en un archivo temporal.
+            newConfig.save(tempFile);
+
+            // 2. Eliminar el backup antiguo si existe.
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+
+            // 3. Renombrar el archivo actual a .bak (creando un backup).
+            if (machinesFile.exists()) {
+                Files.move(machinesFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // 4. Renombrar el archivo temporal al nombre final.
+            Files.move(tempFile.toPath(), machinesFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
         } catch (IOException e) {
-            plugin.getLogger().severe("Could not save machines.yml: " + e.getMessage());
+            plugin.getLogger().severe("CRITICAL: Could not save machines.yml safely. Changes may be lost.");
+            e.printStackTrace();
+
+            // En caso de error, intentar limpiar los archivos temporales
+            if (tempFile.exists()) {
+                tempFile.delete();
+            }
         }
     }
 
@@ -88,8 +131,7 @@ public class SlotMachineManager {
         if (machine != null) {
             machine.cleanup();
             machinesByName.remove(name.toLowerCase());
-            machinesConfig.set("machines." + machine.getName(), null);
-            saveMachines();
+            saveMachines(); // Guardar los cambios después de eliminar
         }
     }
     

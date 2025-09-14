@@ -11,9 +11,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.ArrayList;
-import java.util.Arrays; // <-- IMPORTACIÓN AÑADIDA
+import java.util.Arrays;
 import java.util.List;
 
 public class SlotCommand implements CommandExecutor, TabCompleter {
@@ -52,11 +53,25 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
                 plugin.reloadPluginConfig();
                 MessageUtil.sendMessage(sender, plugin.getLangManager().getString("messages.reload_success"));
                 break;
+            case "help":
+                sendHelp(sender);
+                break;
+            case "ver":
+                handleVer(sender);
+                break;
             default:
                 sendHelp(sender);
                 break;
         }
         return true;
+    }
+
+    private void handleVer(CommandSender sender) {
+        PluginDescriptionFile pdf = plugin.getDescription();
+        MessageUtil.sendMessage(sender, "&e--- Informacion de SlotMachine ---");
+        MessageUtil.sendMessage(sender, "&6Nombre: &f" + pdf.getName());
+        MessageUtil.sendMessage(sender, "&6Autor: &f" + String.join(", ", pdf.getAuthors()));
+        MessageUtil.sendMessage(sender, "&6Version: &f" + pdf.getVersion());
     }
 
     private void handleCreate(CommandSender sender, String[] args) {
@@ -116,7 +131,6 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
     }
 
     public static ItemStack getCoinItem() {
-        // Asegúrate de que tu clase principal (SlotMachinePlugin) tenga un método estático getInstance()
         SlotMachinePlugin plugin = SlotMachinePlugin.getInstance();
         String materialName = plugin.getConfig().getString("coin.material", "GOLD_NUGGET");
         Material material = Material.matchMaterial(materialName);
@@ -135,18 +149,16 @@ public class SlotCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender) {
-        MessageUtil.sendMessage(sender, "&e--- Ayuda de SlotMachine v2 ---");
-        MessageUtil.sendMessage(sender, "&6/slot create <nombre> &f- Crea una maquina.");
-        MessageUtil.sendMessage(sender, "&6/slot delete <nombre> &f- Borra una maquina.");
-        MessageUtil.sendMessage(sender, "&6/slot getcoin [cantidad] &f- Te da fichas.");
-        MessageUtil.sendMessage(sender, "&6/slot reload &f- Recarga la configuracion.");
+        List<String> helpLines = plugin.getLangManager().getStringList("messages.help_message");
+        for (String line : helpLines) {
+            sender.sendMessage(MessageUtil.colorize(line));
+        }
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            // CAMBIO: Se usa Arrays.asList en lugar de List.of para compatibilidad con Java 8
-            return Arrays.asList("create", "delete", "getcoin", "reload");
+            return Arrays.asList("create", "delete", "getcoin", "reload", "help", "ver");
         }
         return new ArrayList<>();
     }

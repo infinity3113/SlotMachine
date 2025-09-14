@@ -57,7 +57,16 @@ messages:
   need_coin_to_play: "&cYou need a {coin_name} &cto play."
   machine_stuck: "&cThe machine got stuck. Please try again."
   no_roulette_items: "&cError: No items configured for the roulette."
-  
+
+  help_message:
+    - "&e--- SlotMachine Help v1 ---"
+    - "&6/slot create <name> &f- Creates a machine."
+    - "&6/slot delete <name> &f- Deletes a machine."
+    - "&6/slot getcoin [amount] &f- Gives you tokens."
+    - "&6/slot reload &f- Reloads the configuration."
+    - "&6/slot help &f- Shows this help message."
+    - "&6/slot ver &f- Shows the plugin information."
+
 jackpot:
   hologram_lines:
     - "&e&lJackpot"

@@ -58,6 +58,15 @@ messages:
   machine_stuck: "&cLa máquina se ha atascado. Inténtalo de nuevo."
   no_roulette_items: "&cError: No hay ítems configurados para la ruleta."
   
+  help_message:
+    - "&e--- Ayuda de SlotMachine v1 ---"
+    - "&6/slot create <nombre> &f- Crea una maquina."
+    - "&6/slot delete <nombre> &f- Borra una maquina."
+    - "&6/slot getcoin [cantidad] &f- Te da fichas."
+    - "&6/slot reload &f- Recarga la configuracion."
+    - "&6/slot help &f- Muestra este mensaje de ayuda."
+    - "&6/slot ver &f- Muestra la informacion del plugin."
+
 jackpot:
   hologram_lines:
     - "&e&lBote"

@@ -7,6 +7,7 @@ import com.infinity3113.slotmachine.listener.MachineCreationListener;
 import com.infinity3113.slotmachine.listener.MachineUseListener;
 import com.infinity3113.slotmachine.listener.SignListener;
 import com.infinity3113.slotmachine.machine.SlotMachineManager;
+import com.infinity3113.slotmachine.util.ConfigUpdater;
 import com.infinity3113.slotmachine.util.LangManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,7 +24,10 @@ public final class SlotMachinePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        saveDefaultConfig();
+        // Llama al actualizador para el config.yml
+        ConfigUpdater.updateConfig(this, "config.yml");
+        // reloadConfig() carga la configuración actualizada en memoria
+        reloadConfig();
 
         this.langManager = new LangManager(this);
 
@@ -63,7 +67,8 @@ public final class SlotMachinePlugin extends JavaPlugin {
 
     public void reloadPluginConfig() {
         reloadConfig();
-        this.langManager = new LangManager(this);
+        ConfigUpdater.updateConfig(this, "config.yml");
+        this.langManager = new LangManager(this); // Esto recargará los archivos de idioma actualizados
         slotMachineManager.loadMachines();
     }
 
