@@ -36,7 +36,8 @@ public class SignListener implements Listener {
         }
 
         try {
-            Double.parseDouble(event.getLine(2));
+            // Se reemplaza la coma por un punto para una validación consistente
+            Double.parseDouble(event.getLine(2).replace(",", "."));
         } catch (Exception e) {
             MessageUtil.sendMessage(player, plugin.getLangManager().getString("messages.invalid_sign_format"));
             event.setLine(0, MessageUtil.colorize("&c[Error]"));
@@ -70,7 +71,12 @@ public class SignListener implements Listener {
         }
 
         try {
-            double pricePerCoin = Double.parseDouble(ChatColor.stripColor(sign.getLine(2)).replace("$", ""));
+            // --- INICIO DE LA CORRECCIÓN ---
+            // Se limpia el texto, se reemplaza la coma por un punto y luego se convierte a número.
+            String priceText = ChatColor.stripColor(sign.getLine(2)).replace("$", "").replace(",", ".");
+            double pricePerCoin = Double.parseDouble(priceText);
+            // --- FIN DE LA CORRECCIÓN ---
+            
             PurchaseMenu menu = new PurchaseMenu(plugin, pricePerCoin, player);
             menu.open(player);
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot; // <-- IMPORTANTE: Añadir esta línea
 import org.bukkit.inventory.ItemStack;
 
 public class MachineUseListener implements Listener {
@@ -22,6 +23,13 @@ public class MachineUseListener implements Listener {
 
     @EventHandler
     public void onMachineUse(PlayerInteractEvent event) {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Se añade esta condición para ignorar el evento de la mano secundaria
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getClickedBlock() == null || event.getClickedBlock().getType() != Material.JUKEBOX) return;
 
